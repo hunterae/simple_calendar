@@ -1,0 +1,51 @@
+<% calendar.define :calendar do %>
+  <%= calendar.render :header %>
+  <%= calendar.render :table %>
+<% end %>
+
+<% calendar.define :header do %>
+  <%= content_tag :header, calendar.get_option(:header) do %>
+    <%= calendar.render :previous_link %>
+    <%= calendar.render :title %>
+    <%= calendar.render :next_link %>
+  <% end %>
+<% end %>
+
+<% calendar.define :previous_link do %>
+  <%= calendar.get_option(:previous_link, calendar.param_name, calendar.date_range) %>
+<% end %>
+
+<% calendar.define :title do %>
+  <%= calendar.get_option(:title, calendar.start_date) %>
+<% end %>
+
+<% calendar.define :next_link do %>
+  <%= calendar.get_option(:next_link, calendar.param_name, calendar.date_range) %>
+<% end %>
+
+<% calendar.define :table do %>
+  <%= content_tag :table, calendar.get_option(:table) do %>
+    <%= calendar.get_option(:thead, calendar.date_range.to_a.slice(0, 7)) %>
+    <%= calendar.render :weeks %>
+  <% end %>
+<% end %>
+
+<% calendar.define :weeks, :wrap_with => {:tag => :tbody}.merge(calendar.get_option(:tbody) || {}) do %>
+  <% calendar.date_range.each_slice(7) do |week| %>
+    <%= calendar.render :week, week, :wrap_with => calendar.get_option(:tr, week).merge(:tag => :tr) %>
+  <% end %>
+<% end %>
+
+<% calendar.define :week do |week| %>
+  <% week.map do |day| %>
+    <%= content_tag :td, calendar.get_option(:td, calendar.start_date, day) do %>
+      <%= calendar.render :day, day, calendar.events_for_date(day) %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% calendar.define :day do |date, events| %>
+  <%= date %>
+<% end %>
+
+<%= calendar.render :calendar %>

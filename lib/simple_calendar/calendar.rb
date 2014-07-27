@@ -1,5 +1,5 @@
 module SimpleCalendar
-  class Calendar
+  class Calendar < WithTemplate::Base
     delegate :capture, :concat, :content_tag, :link_to, :params, :raw, :safe_join, to: :view_context
 
     attr_reader :block, :events, :options, :view_context
@@ -18,52 +18,53 @@ module SimpleCalendar
       )
 
       @options      = opts
+      super(view_context, opts)
     end
 
-    def render(block)
-      @block = block
-
-      capture do
-        concat render_header
-        concat render_table
-      end
-    end
-
-    def render_header
-      capture do
-        content_tag :header, get_option(:header) do
-          concat get_option(:previous_link, param_name, date_range)
-          concat get_option(:title, start_date)
-          concat get_option(:next_link, param_name, date_range)
-        end
-      end
-    end
-
-    def render_table
-      content_tag :table, get_option(:table)  do
-        capture do
-          concat get_option(:thead, date_range.to_a.slice(0, 7))
-          concat content_tag(:tbody, render_weeks, get_option(:tbody))
-        end
-      end
-    end
-
-    def render_weeks
-      capture do
-        date_range.each_slice(7) do |week|
-          concat content_tag(:tr, render_week(week), get_option(:tr, week))
-        end
-      end
-    end
-
-    def render_week(week)
-      results = week.map do |day|
-        content_tag :td, get_option(:td, start_date, day) do
-          block.call(day, events_for_date(day))
-        end
-      end
-      safe_join results
-    end
+    # def render(block)
+    #    @block = block
+    # 
+    #    capture do
+    #      concat render_header
+    #      concat render_table
+    #    end
+    #  end
+    # 
+    #  def render_header
+    #    capture do
+    #      content_tag :header, get_option(:header) do
+    #        concat get_option(:previous_link, param_name, date_range)
+    #        concat get_option(:title, start_date)
+    #        concat get_option(:next_link, param_name, date_range)
+    #      end
+    #    end
+    #  end
+    # 
+    #  def render_table
+    #    content_tag :table, get_option(:table)  do
+    #      capture do
+    #        concat get_option(:thead, date_range.to_a.slice(0, 7))
+    #        concat content_tag(:tbody, render_weeks, get_option(:tbody))
+    #      end
+    #    end
+    #  end
+    # 
+    #  def render_weeks
+    #    capture do
+    #      date_range.each_slice(7) do |week|
+    #        concat content_tag(:tr, render_week(week), get_option(:tr, week))
+    #      end
+    #    end
+    #  end
+    # 
+    #  def render_week(week)
+    #    results = week.map do |day|
+    #      content_tag :td, get_option(:td, start_date, day) do
+    #        block.call(day, events_for_date(day))
+    #      end
+    #    end
+    #    safe_join results
+    #  end
 
     def param_name
       @param_name ||= options.fetch(:param_name, :start_date)

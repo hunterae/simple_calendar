@@ -2,7 +2,9 @@ module SimpleCalendar
   module ViewHelpers
     def calendar(options={}, &block)
       raise 'calendar requires a block' unless block_given?
-      SimpleCalendar::Calendar.new(self, options).render(block)
+      # SimpleCalendar::Calendar.new(self, options).render(block)
+      SimpleCalendar::Calendar.new(self, options.merge(:variable => "calendar", :block => block)).
+        render_template("calendars/calendar", &block)
     end
 
     def month_calendar(options={}, &block)
